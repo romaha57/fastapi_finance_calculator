@@ -1,11 +1,10 @@
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
 
-from config import settings
-from api.operations import operation_router
 from api.auth import auth_router
 from api.file_handler import file_router
-
+from api.operations import operation_router
+from config import settings
 
 tags_metadata = [
     {

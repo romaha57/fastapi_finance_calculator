@@ -1,38 +1,45 @@
 import datetime
 
-from fastapi import HTTPException, status, Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from passlib.hash import bcrypt
 from jose import jwt
+from passlib.hash import bcrypt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from db_config import create_session
-from schemas.auth_schemas import User, Token, UserCreate
-from models import UserModel
-
 from config import settings
-
+from db_config import create_session
+from models import UserModel
+from schemas.auth_schemas import Token, User, UserCreate
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login/")
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    """Получает текущего юзера на сайте с валидацией его токена"""
+
     return AuthService.validate_token(token)
 
 
 class AuthService:
+    """Класс аутентификации пользователя"""
 
     @classmethod
     def hash_password(cls, raw_password: str) -> str:
+        """Хеширует пароль пользователя"""
+
         return bcrypt.hash(raw_password)
 
     @classmethod
     def verify_password(cls, password: str, hash_password: str) -> bool:
+        """Проверяет введный пользователь пароль при аутентификации"""
+
         return bcrypt.verify(password, hash_password)
 
     @classmethod
     def validate_token(cls, token: str) -> User:
+        """Получает пользователя из JWT-токена и проверяет валидность"""
+
         exception = HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Невалидный токен",
@@ -58,6 +65,8 @@ class AuthService:
 
     @classmethod
     def create_token(cls, user: UserModel) -> Token:
+        """Генерирует JWT-токен для пользователя"""
+
         user_data = User.from_orm(user)
 
         now = datetime.datetime.utcnow()
@@ -79,9 +88,13 @@ class AuthService:
         return Token(access_token=token)
 
     def __init__(self, session: Session = Depends(create_session)):
+        """Иницилизации сессии для работы с БД"""
+
         self.session = session
 
     def registration_user(self, user: UserCreate) -> Token:
+        """Регистрация пользователя в БД"""
+
         user = UserModel(
             email=user.email,
             username=user.username,
@@ -94,6 +107,8 @@ class AuthService:
         return self.create_token(user)
 
     def authenticate_user(self, username: str, password: str) -> Token:
+        """Аутентификация пользователя в БД"""
+
         exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неправильный логин или пароль",

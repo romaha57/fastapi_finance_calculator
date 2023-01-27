@@ -4,15 +4,21 @@ from typing import Any
 
 from fastapi import Depends
 
+from schemas.record_schemas import RecordBase
 from services.operations import OperationService
-from schemas.record_schemas import RecordCreate, Record, RecordBase
 
 
 class FileService:
-    def __init__(self, operation_service: OperationService = Depends()):
+    """Класс для работы с CSV-файлами"""
+
+    def __init__(self, operation_service: OperationService = Depends()) -> None:
+        """Создание сервиса операции для работы с записями в БД"""
+
         self.operation_service = operation_service
 
-    def dump_csv_file(self, user_id: int, file: Any):
+    def dump_csv_file(self, user_id: int, file: Any) -> int:
+        """"""
+
         reader = csv.DictReader(
             (line.decode() for line in file),
             fieldnames=["created_at", "amount", "type_operation", "description"]
@@ -26,11 +32,11 @@ class FileService:
                 record.description = 'без описания'
             records.append(record)
 
-        self.operation_service.create_name_records(records, user_id=user_id)
+        self.operation_service.create_many_records(records, user_id=user_id)
 
         return len(records)
 
-    def load_csv_file(self, user_id: int):
+    def load_csv_file(self, user_id: int) -> StringIO:
         output = StringIO()
         writer = csv.DictWriter(
             output,
@@ -46,6 +52,3 @@ class FileService:
 
         output.seek(0)
         return output
-
-
-

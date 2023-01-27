@@ -2,6 +2,8 @@ from pydantic import BaseModel, EmailStr
 
 
 class BaseUser(BaseModel):
+    """Базовая модель пользователя для аутентификации"""
+
     email: EmailStr
     username: str
 
@@ -10,6 +12,8 @@ class BaseUser(BaseModel):
 
 
 class User(BaseUser):
+    """Модель пользователя для отображения"""
+
     id: int
 
     class Config:
@@ -17,9 +21,13 @@ class User(BaseUser):
 
 
 class UserCreate(BaseUser):
+    """Модель пользователя для создания пользователя"""
+
     password: str
 
 
 class Token(BaseModel):
+    """Модель JWT-токена для аутентификации"""
+
     access_token: str
     token_type: str = 'bearer'

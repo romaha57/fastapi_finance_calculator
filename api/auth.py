@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from models import UserModel
-from schemas.auth_schemas import UserCreate, Token, User
-
+from schemas.auth_schemas import Token, User, UserCreate
 from services.auth import AuthService, get_current_user
 
 auth_router = APIRouter(prefix="/auth", tags=["Users"])
@@ -32,4 +30,6 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), service: AuthSe
 
 @auth_router.get("/user", response_model=User)
 def get_user(user: User = Depends(get_current_user)):
+    """Получения пользователя по id"""
+
     return user

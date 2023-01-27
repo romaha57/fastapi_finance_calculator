@@ -1,14 +1,16 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Numeric, Text, ForeignKey
-from sqlalchemy_utils import EmailType
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, Numeric, String,
+                        Text)
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy_utils import EmailType
 
 Base = declarative_base()
 
 
 class UserModel(Base):
+    """Модель для пользователя"""
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
@@ -18,6 +20,8 @@ class UserModel(Base):
 
 
 class RecordModel(Base):
+    """Модель для записи(учет доходов/расходов)"""
+
     __tablename__ = "records"
 
     id = Column(Integer, primary_key=True)
@@ -26,5 +30,3 @@ class RecordModel(Base):
     type_operation = Column(String)
     description = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-
-

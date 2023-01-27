@@ -1,17 +1,21 @@
 from datetime import datetime
-from typing import Optional
 from decimal import Decimal
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel
 
 
 class OperationType(str, Enum):
+    """Тип операции доход/расход"""
+
     income = "income"
     outcome = "expenses"
 
 
 class RecordBase(BaseModel):
+    """Базовая модель записи"""
+
     created_at: datetime = datetime.now()
     amount: Decimal
     type_operation: OperationType
@@ -22,6 +26,8 @@ class RecordBase(BaseModel):
 
 
 class Record(RecordBase):
+    """Модель записи для отображения"""
+
     id: int
 
     class Config:
@@ -29,8 +35,12 @@ class Record(RecordBase):
 
 
 class RecordCreate(RecordBase):
+    """Модель записи для создания"""
+
     pass
 
 
 class RecordUpdate(RecordBase):
+    """Модель записи для обновления"""
+
     pass
